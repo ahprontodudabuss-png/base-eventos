@@ -59,13 +59,23 @@
 <script>
     // Inicializa o Google Identity Services com o Client ID configurado
     window.onload = function () {
-        if (CONFIG.GOOGLE_CLIENT_ID === '1045722589397-lfjm5dqi4d4bcrgfm4tvlfs0h6q97e2h.apps.googleusercontent.com') {
-            document.getElementById('alert-container').textContent = 'Atenção: Configure o GOOGLE_CLIENT_ID no arquivo config.js';
-            document.getElementById('alert-container').classList.remove('hidden');
-        } else {
-            document.getElementById('g_id_onload').setAttribute('data-client_id', CONFIG.GOOGLE_CLIENT_ID);
+    google.accounts.id.initialize({
+        client_id: CONFIG.GOOGLE_CLIENT_ID,
+        callback: handleCredentialResponse
+    });
+
+    google.accounts.id.renderButton(
+        document.getElementById("google-signin"),
+        {
+            type: "standard",
+            theme: "outline",
+            size: "large",
+            text: "signin_with",
+            shape: "rectangular",
+            logo_alignment: "left"
         }
-    };
+    );
+};
 
     // Callback quando o login é bem-sucedido
     function handleCredentialResponse(response) {
