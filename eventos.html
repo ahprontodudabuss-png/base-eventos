@@ -21,7 +21,7 @@
     <!-- Sidebar -->
     <aside class="sidebar w-64 flex-shrink-0">
         <div class="p-4 flex items-center space-x-3 border-b border-gray-700">
-            <img src="assets/img/logo.png" alt="Logo" class="logo-small">
+            <img src="logo.png" alt="Logo" class="logo-small">
             <span class="font-bold text-xl">IDV</span>
         </div>
         <nav class="mt-4">
@@ -59,11 +59,11 @@
         }
 
         async function loadEventos() {
-            if(CONFIG.API_URL === 'COLOQUE_AQUI_A_URL_DO_SEU_APPS_SCRIPT') {
+            if(CONFIG.API_URL === 'https://script.google.com/u/0/home/projects/1rDdi_9FYAD6T-dabWtF5p82JqCQYLsc1VVfC3DlEBQigxREi4qnmvOMd/edit') {
                 document.getElementById('eventosGrid').innerHTML = `
                     <div class="col-span-full bg-red-100 border-l-4 border-red-500 text-red-700 p-4">
                         <p class="font-bold">Atenção</p>
-                        <p>Configure a API_URL no arquivo assets/js/config.js</p>
+                        <p>Configure a API_URL no arquivo config.js</p>
                     </div>`;
                 return;
             }
