@@ -6,6 +6,8 @@
     <title>IDV - Missão Guarulhos | Login</title>
     <link rel="icon" href="favicon.ico" type="image/x-icon">
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <script src="config.js"></script>
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
     <style>
         body {
             background-color: #f3f4f6;
@@ -30,17 +32,10 @@
             height: auto;
             margin: 0 auto 1.5rem auto;
         }
-        .btn-primary {
-            background-color: #ca8a04; /* Cor dourada combinando com o logo */
-            color: white;
-            padding: 0.75rem;
-            border-radius: 0.375rem;
-            width: 100%;
-            font-weight: bold;
-            transition: background-color 0.3s;
-        }
-        .btn-primary:hover {
-            background-color: #a16207;
+        .google-btn-container {
+            display: flex;
+            justify-content: center;
+            margin-top: 1.5rem;
         }
     </style>
 </head>
@@ -48,33 +43,62 @@
 
 <div class="login-container">
     <img src="logo.png" alt="IDV Logo" class="logo">
-    <h1 class="text-2xl font-bold mb-6 text-gray-800">IDV - Missão Guarulhos</h1>
+    <h1 class="text-2xl font-bold mb-2 text-gray-800">IDV - Missão Guarulhos</h1>
+    <p class="text-sm text-gray-500 mb-6">Integrador de Dados de Eventos</p>
     
-    <form id="loginForm">
-        <div class="mb-4 text-left">
-            <label for="email" class="block text-gray-700 text-sm font-bold mb-2">E-mail</label>
-            <input type="email" id="email" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" required>
+    <div id="alert-container" class="hidden mb-4 p-3 bg-red-100 text-red-700 rounded text-sm">
+        <!-- Mensagens de erro aparecerão aqui -->
+    </div>
+
+    <!-- Botão do Google Sign-In -->
+    <div class="google-btn-container">
+        <div id="g_id_onload"
+             data-context="signin"
+             data-ux_mode="popup"
+             data-callback="handleCredentialResponse"
+             data-auto_prompt="false">
         </div>
-        <div class="mb-6 text-left">
-            <label for="password" class="block text-gray-700 text-sm font-bold mb-2">Senha</label>
-            <input type="password" id="password" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 mb-3 leading-tight focus:outline-none focus:shadow-outline" required>
+        <div class="g_id_signin"
+             data-type="standard"
+             data-shape="rectangular"
+             data-theme="outline"
+             data-text="signin_with"
+             data-size="large"
+             data-logo_alignment="left">
         </div>
-        <button type="submit" class="btn-primary">Entrar no Sistema</button>
-    </form>
-    
-    <p class="mt-4 text-sm text-gray-500">Integrador de Dados de Eventos</p>
+    </div>
 </div>
 
 <script>
-    document.getElementById('loginForm').addEventListener('submit', function(e) {
-        e.preventDefault();
-        // Simulação de login - na versão real conectaria com Apps Script ou Firebase
-        const email = document.getElementById('email').value;
-        if(email) {
-            localStorage.setItem('idv_user', email);
-            window.location.href = 'dashboard.html';
+    // Inicializa o Google Identity Services com o Client ID configurado
+    window.onload = function () {
+        if (CONFIG.GOOGLE_CLIENT_ID === '1045722589397-lfjm5dqi4d4bcrgfm4tvlfs0h6q97e2h.apps.googleusercontent.com') {
+            document.getElementById('alert-container').textContent = 'Atenção: Configure o GOOGLE_CLIENT_ID no arquivo config.js';
+            document.getElementById('alert-container').classList.remove('hidden');
+        } else {
+            document.getElementById('g_id_onload').setAttribute('data-client_id', CONFIG.GOOGLE_CLIENT_ID);
         }
-    });
+    };
+
+    // Callback quando o login é bem-sucedido
+    function handleCredentialResponse(response) {
+        // O response.credential é um JWT (JSON Web Token)
+        const jwt = response.credential;
+        
+        // Decodificar o JWT para pegar os dados do usuário (apenas no frontend para display)
+        const payload = JSON.parse(atob(jwt.split('.')[1]));
+        
+        // Salvar os dados da sessão
+        localStorage.setItem('idv_user', JSON.stringify({
+            name: payload.name,
+            email: payload.email,
+            picture: payload.picture,
+            token: jwt // Guarda o token para enviar para a API (se necessário)
+        }));
+        
+        // Redirecionar para o dashboard
+        window.location.href = 'dashboard.html';
+    }
     
     // Se já estiver logado, redireciona
     if(localStorage.getItem('idv_user')) {
